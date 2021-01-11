@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>System-level environment isolation</title>
+    <link href="epub.css" rel="stylesheet" type="text/css"/>
+    <meta content="DocBook XSL Stylesheets V1.75.2" name="generator"/>
+</head>
+<body id="page">
+<div class="section" title="System-level environment isolation">
+    <div class="titlepage">
+        <div>
+            <div><h1 class="title">System-level environment isolation</h1></div>
+        </div>
+    </div>
+    <p>In most cases, software implementation can iterate fast because developers reuse a lot of existing components.
+        Don't Repeat Yourself—this is a popular rule and motto of many programmers. Using other packages and modules to
+        include them in the codebase is only a part of that culture. What also can be considered under "reused
+        components" are binary libraries, databases, system services, third-party APIs, and so on. Even whole operating
+        systems should be considered as reused.</p>
+    <p>Backend services of web-based applications are a great example of how complex such applications can be. The
+        simplest software stack usually consists of a few layers (starting from the lowest):</p>
+    <div class="itemizedlist">
+        <ul class="itemizedlist">
+            <li class="listitem" style="list-style-type: disc">A database or other kind of storage</li>
+            <li class="listitem" style="list-style-type: disc">The application code implemented in Python</li>
+            <li class="listitem" style="list-style-type: disc">An HTTP server such as Apache or NGINX</li>
+        </ul>
+    </div>
+    <p>Of course such stack can be even simpler but it is very unlikely. In fact, big applications are often so complex
+        that it is hard to distinguish single layers. Big applications can use many different databases, be divided into
+        multiple independent processes, and use many other system services for caching, queuing, logging, service
+        discovery, and so on. Sadly, there are no limits for complexity and it seems that code simply follows the second
+        law of thermodynamics.</p>
+    <p>What really is important is that not all of the software stack elements can be isolated on the level of Python
+        runtime environment. No matter whether it is an HTTP server such as NGINX or RDBMS such as PostgreSQL, they are
+        usually available in different versions on different systems. Making sure that everyone in a development team
+        uses the same versions of every component is very hard without proper tools. It is theoretically possible that
+        all developers in a team working on a single project will be able to get the same versions of services on their
+        development boxes. But all this effort is futile if they do not use the same operating system as in the
+        production environment. And forcing a programmer to work on something else other than his beloved system of
+        choice is impossible for sure.</p>
+    <p>The problem lies in the fact that portability is still a big challenge. Not all services will work in exactly the
+        same way in production environments as they do on the developer's machines and that is very unlikely to change.
+        Even Python can behave differently on different systems despite how much work is put in to make it
+        cross-platform. Usually, this is well documented and happens only in places that depend directly on system
+        calls, but relying on the programmer's ability to remember a long list of compatibility quirks is quite an error
+        prone strategy.</p>
+    <p>A popular solution to this problem is by isolating whole systems as application environments. This is usually
+        achieved by leveraging different types of system virtualization tools. Virtualization, of course, reduces
+        performance, but with modern computers that have hardware support for virtualization, the performance loss is
+        usually negligible. On the other hand, a list of possible gains is very long:</p>
+    <div class="itemizedlist">
+        <ul class="itemizedlist">
+            <li class="listitem" style="list-style-type: disc">The development environment can exactly match the system
+                version and services used in production, which helps in solving compatibility issues
+            </li>
+            <li class="listitem" style="list-style-type: disc">Definitions for system configuration tools such as
+                Puppet, Chef, or Ansible (if used) can be reused for configuration of the development environment
+            </li>
+            <li class="listitem" style="list-style-type: disc">The newly hired team members can easily hop into the
+                project if the creation of such environments is automated
+            </li>
+            <li class="listitem" style="list-style-type: disc">The developers can work directly with low system-level
+                features that may not be available on operating systems they use for work, for example, <span
+                        class="strong"><strong>FUSE</strong></span> (<span class="strong"><strong>File System in User Space</strong></span>)
+                that is not available in Windows
+            </li>
+        </ul>
+    </div>
+    <div class="section" title="Virtual development environments using Vagrant">
+        <div class="titlepage">
+            <div>
+                <div><h2 class="title">Virtual development environments using Vagrant</h2></div>
+            </div>
+        </div>
+        <p>Vagrant currently seems to be the most popular tool that provides a simple and convenient way to create and
+            manage development environments. It is available for Windows, Mac OS, and a few popular Linux distributions
+            (refer to <a class="ulink" href="https://www.vagrantup.com">https://www.vagrantup.com</a>). It does not have
+            any additional dependencies. Vagrant creates new development environments in the form of virtual machines or
+            containers. The exact implementation depends on a choice of virtualization providers. VirtualBox is the
+            default provider and it is bundled with the Vagrant installer but additional providers are available as
+            well. The most notable choices are VMware, Docker, LXC (Linux Containers), and Hyper-V.</p>
+        <p>The most important configuration is provided to Vagrant in a single file named <code class="literal">Vagrantfile</code>.
+            It should be independent for every project. The following are the most important things it provides:</p>
+        <div class="itemizedlist">
+            <ul class="itemizedlist">
+                <li class="listitem" style="list-style-type: disc">Choice of virtualization provider</li>
+                <li class="listitem" style="list-style-type: disc">Box used as a virtual machine image</li>
+                <li class="listitem" style="list-style-type: disc">Choice of provisioning method</li>
+                <li class="listitem" style="list-style-type: disc">Shared storage between a VM and a VM's host</li>
+                <li class="listitem" style="list-style-type: disc">Ports that need to be forwarded between a VM and its
+                    host
+                </li>
+            </ul>
+        </div>
+        <p>Syntax language for the <code class="literal">Vagrantfile</code> is Ruby. The example configuration file
+            provides a good template to start the project and has an excellent documentation, so the knowledge of this
+            language is not required. Template configuration can be created using a single command:</p>
+        <div class="informalexample"><pre class="programlisting">
+<span class="strong"><strong>vagrant init</strong></span>
+</pre>
+        </div>
+        <p>This will create a new file named <code class="literal">Vagrantfile</code> in the current working directory.
+            The best place to store this file is usually the root of the related project sources. This file is already a
+            valid configuration that will create a new VM using the default provider and base box image. No provisioning
+            is enabled by default. After the addition of <code class="literal">Vagrantfile</code>, the new VM is started
+            using:</p>
+        <div class="informalexample"><pre class="programlisting">
+<span class="strong"><strong>vagrant up</strong></span>
+</pre>
+        </div>
+        <p>The initial start can take a few minutes because the actual box must be downloaded from the Web. There is
+            also some initialization process that may take some time depending on the used provider, box, and system
+            performance every time the already existing VM is brought up. Usually, this takes only a couple of seconds.
+            Once the new Vagrant environment is up and running, developers can connect to SSH using this shorthand:</p>
+        <div class="informalexample"><pre class="programlisting">
+<span class="strong"><strong>vagrant ssh</strong></span>
+</pre>
+        </div>
+        <p>This can be done anywhere in the project source tree below the location of <code
+                class="literal">Vagrantfile</code>. For developers' convenience, we will look in the directories above
+            for the configuration file and match it with the related VM instance. Then, it establishes the secure shell
+            connection, so the development environment can be interacted with like any ordinary remote machine. The only
+            difference is that the whole project source tree (root defined as a location of <code class="literal">Vagrantfile</code>)
+            is available on the VM's filesystem under <code class="literal">/vagrant/</code>.</p></div>
+    <div class="section" title="Containerization versus virtualization">
+        <div class="titlepage">
+            <div>
+                <div><h2 class="title">Containerization versus virtualization</h2></div>
+            </div>
+        </div>
+        <p>Containers are an alternative to full machine virtualization. It is a lightweight method of virtualization,
+            where the kernel and operating system allow the running of multiple isolated user space instances. OS is
+            shared between containers and host, so it theoretically requires less overhead than in full virtualization.
+            Such a container contains only application code and its system-level dependencies, but from the perspective
+            of processes running inside, it looks like a completely isolated system environment.</p>
+        <p>Software containers got their popularity mostly thanks to Docker; that is one of the available
+            implementations. Docker allows to describe its container in the form of a simple text document called <code
+                    class="literal">Dockerfile</code>. Containers from such definitions can be built and stored. It also
+            supports incremental changes, so if new things are added to the container then it does not need to be
+            recreated from scratch.</p>
+        <p>Different tools such as Docker and Vagrant seem to overlap in features but the main difference between them
+            is the reason why these tools were built. Vagrant, as mentioned earlier, is built primarily as a tool for
+            development. It allows to bootstrap the whole virtual machine with a single command, but does not allow to
+            simply pack it and deploy or release as is. Docker, on the other hand, is built exactly for that—preparing
+            complete containers that can be sent and deployed to production as a whole package. If implemented well,
+            this can greatly improve the process of product deployment. Because of that, using Docker and similar
+            solutions (Rocket, for example) during development makes sense only if it also has to be used in the
+            deployment process on production. Using it only for isolation purposes during development may generate too
+            much overhead and also has a drawback of not being consistent.</p></div>
+</div>
+</body>
+</html>

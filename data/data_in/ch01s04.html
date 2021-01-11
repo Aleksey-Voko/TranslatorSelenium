@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Python 3 adoption at the time of writing this book</title>
+    <link href="epub.css" rel="stylesheet" type="text/css"/>
+    <meta content="DocBook XSL Stylesheets V1.75.2" name="generator"/>
+</head>
+<body id="page">
+<div class="section" title="Python 3 adoption at the time of writing this book">
+    <div class="titlepage">
+        <div>
+            <div><h1 class="title">Python 3 adoption at the time of writing this book</h1></div>
+        </div>
+    </div>
+    <p>So, is Python 3, thanks to new exciting features, well adopted among its community? Sadly, not yet. The popular
+        page Python 3 Wall of Superpowers (<a class="ulink" href="https://python3wos.appspot.com">https://python3wos.appspot.com</a>)
+        that tracks the compatibility of most popular packages with the Python 3 branch was, until not so long ago,
+        named Python 3 Wall of Shame. This situation is changing and the table of listed packages on the mentioned page
+        is slowly turning "more green" with every month. Still, this does not mean that all teams building their
+        applications will shortly use only Python 3. When all popular packages are available on Python 3, the popular
+        excuse—the packages that we use are not ported yet—will no longer be valid.</p>
+    <p>The main reason for such a situation is that porting the existing application from Python 2 to Python 3 is always
+        a challenge. There are tools like 2to3 that can perform automated code translation but they do not ensure that
+        the result will be 100% correct. Also, such translated code may not perform as well as in its original form
+        without manual adjustments. The moving of existing complex code bases to Python 3 might involve tremendous
+        effort and cost that some organizations may not be able to afford. Still such costs can be split in time. Some
+        good software architecture design methodologies, such as service-oriented architecture or microservices, can
+        help to achieve this goal gradually. New project components (services or microservices) can be written using the
+        new technology and existing ones can be ported one at a time.</p>
+    <p>In the long run, moving to Python 3 can only have beneficial effects on a project. According to PEP-404, there
+        won't be a 2.8 release in the 2.x branch of Python anymore. Also, there may be a time in the future when all
+        major projects such as Django, Flask, and numpy will drop any 2.x compatibility and will only be available on
+        Python 3.</p>
+    <p>My personal opinion on this topic can be considered controversial. I think that the best incentive for the
+        community would be to completely drop Python 2 support when creating new packages. This, of course, greatly
+        limits the reach of such software but it may be the only way to change the way of thinking of those who insist
+        on sticking to Python 2.x.</p></div>
+</body>
+</html>

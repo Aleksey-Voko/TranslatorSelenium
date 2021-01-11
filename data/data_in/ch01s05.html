@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>The main differences between Python 3 and Python 2</title>
+    <link href="epub.css" rel="stylesheet" type="text/css"/>
+    <meta content="DocBook XSL Stylesheets V1.75.2" name="generator"/>
+</head>
+<body id="page">
+<div class="section" title="The main differences between Python 3 and Python 2">
+    <div class="titlepage">
+        <div>
+            <div><h1 class="title">The main differences between Python 3 and Python 2</h1></div>
+        </div>
+    </div>
+    <p>It has already been said that Python 3 breaks backwards compatibility with Python 2. Still, it is not a complete
+        redesign. Also, it does not mean that every Python module written for a 2.x release will stop working under
+        Python 3. It is possible to write completely cross-compatible code that will run on both major releases without
+        additional tools or techniques, but usually it is possible only for simple applications.</p>
+    <div class="section" title="Why should I care?">
+        <div class="titlepage">
+            <div>
+                <div><h2 class="title">Why should I care?</h2></div>
+            </div>
+        </div>
+        <p>Despite my personal opinion on Python 2 compatibility, exposed earlier in this chapter, it is impossible to
+            simply forget about it right at this time. There are still some useful packages (such as fabric, mentioned
+            in <a class="link" href="ch06.html" title="Chapter 6. Deploying Code">Chapter 6</a>, <span class="emphasis"><em>Deploying the Code</em></span>)
+            that are really worth using but are not likely to be ported in the very near future.</p>
+        <p>Also, sometimes we may be constrained by the organization we work in. The existing legacy code may be so
+            complex that porting it is not economically feasible. So, even if we decide to move on and live only in the
+            Python 3 world from now on, it will be impossible to completely live without Python 2 for some time.</p>
+        <p>Nowadays, it is very hard to name oneself a professional developer without giving something back to the
+            community, so helping the open source developers in adding Python 3 compatibility to the existing packages
+            is a good way to pay off the "moral debt" incurred by using them. This, of course, cannot be done without
+            knowing the differences between Python 2 and Python 3. By the way, this is also a great exercise for those
+            new in Python 3.</p></div>
+    <div class="section" title="The main syntax differences and common pitfalls">
+        <div class="titlepage">
+            <div>
+                <div><h2 class="title">The main syntax differences and common pitfalls</h2></div>
+            </div>
+        </div>
+        <p>The Python documentation is the best reference for differences between every release. Anyway, for readers'
+            convenience, this section summarizes the most important ones. This does not change the fact that the
+            documentation is mandatory reading for those not familiar with Python 3 yet (see <a class="ulink"
+                                                                                                href="https://docs.python.org/3.0/whatsnew/3.0.html">https://docs.python.org/3.0/whatsnew/3.0.html</a>).
+        </p>
+        <p>The breaking changes introduced by Python 3 can generally be divided into a few groups:</p>
+        <div class="itemizedlist">
+            <ul class="itemizedlist">
+                <li class="listitem" style="list-style-type: disc">Syntax changes, wherein some syntax elements were
+                    removed/changed and other elements were added
+                </li>
+                <li class="listitem" style="list-style-type: disc">Changes in the standard library</li>
+                <li class="listitem" style="list-style-type: disc">Changes in datatypes and collections</li>
+            </ul>
+        </div>
+        <div class="section" title="Syntax changes">
+            <div class="titlepage">
+                <div>
+                    <div><h3 class="title">Syntax changes</h3></div>
+                </div>
+            </div>
+            <p>Syntax changes that make it difficult for the existing code to run are the easiest to spot—they will
+                cause the code to not run at all. The Python 3 code that features new syntax elements will fail to run
+                on Python 2 and vice versa. The elements that are removed will make Python 2 code visibly incompatible
+                with Python 3. The running code that has such issues will immediately cause the interpreter to fail
+                raising a <code class="literal">SyntaxError</code> exception. Here is an example of the broken script
+                that has exactly two statements, of which none will be executed due to the syntax error:</p>
+            <div class="informalexample"><pre class="programlisting">print("hello world")
+print "goodbye python2"</pre>
+            </div>
+            <p>Its actual result when run on Python 3 is as follows:</p>
+            <div class="informalexample"><pre class="programlisting">
+<span class="strong"><strong>$ python3 script.py</strong></span>
+<span class="strong"><strong>  File "script.py", line 2</strong></span>
+<span class="strong"><strong>    print "goodbye python2"</strong></span>
+<span class="strong"><strong>                         ^</strong></span>
+<span class="strong"><strong>SyntaxError: Missing parentheses in call to 'print'</strong></span>
+</pre>
+            </div>
+            <p>The list of such differences is a bit long and, from time to time, any new Python 3.x release may add new
+                elements of syntax that will raise such errors on earlier releases of Python (even on the same 3.x
+                branch). The most important of them are covered in <a class="link" href="ch02.html"
+                                                                      title="Chapter 2. Syntax Best Practices – below the Class Level">Chapter
+                    2</a>, <span class="emphasis"><em>Syntax Best Practices – below the Class Level</em></span>, and <a
+                        class="link" href="ch03.html" title="Chapter 3. Syntax Best Practices – above the Class Level">Chapter
+                    3</a>, <span class="emphasis"><em>Syntax Best Practices – above the Class Level</em></span>, so
+                there is no need to list all of them here.</p>
+            <p>The list of things dropped or changed from Python 2.7 is shorter, so here are the most important
+                ones:</p>
+            <div class="itemizedlist">
+                <ul class="itemizedlist">
+                    <li class="listitem" style="list-style-type: disc"><code class="literal">print</code> is no longer a
+                        statement but a function instead, so the parenthesis is now obligatory.
+                    </li>
+                    <li class="listitem" style="list-style-type: disc">Catching exceptions changed from <code
+                            class="literal">except exc, var</code> to <code class="literal">except exc as var</code>.
+                    </li>
+                    <li class="listitem" style="list-style-type: disc">The <code class="literal">&lt;&gt;</code>
+                        comparison operator has been removed in favor of <code class="literal">!=</code>.
+                    </li>
+                    <li class="listitem" style="list-style-type: disc"><code class="literal">from module import *</code>
+                        (<a class="ulink" href="https://docs.python.org/3.0/reference/simple_stmts.html#import">https://docs.python.org/3.0/reference/simple_stmts.html#import</a>)
+                        is now allowed only on a module level, no longer inside the functions.
+                    </li>
+                    <li class="listitem" style="list-style-type: disc"><code class="literal">from .[module] import
+                        name</code> is now the only accepted syntax for relative imports. All imports not starting with
+                        the dot character are interpreted as absolute imports.
+                    </li>
+                    <li class="listitem" style="list-style-type: disc">The <code class="literal">sort()</code> function
+                        and the list's <code class="literal">sorted()</code> method no longer accept the <code
+                                class="literal">cmp</code> argument. The <code class="literal">key</code> argument
+                        should be used instead.
+                    </li>
+                    <li class="listitem" style="list-style-type: disc">Division expressions on integers such as 1/2
+                        return floats. The truncating behavior is achieved through the <code class="literal">//</code>
+                        operator like <code class="literal">1//2</code>. The good thing is that this can be used with
+                        floats too, so <code class="literal">5.0//2.0 == 2.0</code>.
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="section" title="Changes in the standard library">
+            <div class="titlepage">
+                <div>
+                    <div><h3 class="title">Changes in the standard library</h3></div>
+                </div>
+            </div>
+            <p>Breaking changes in the standard library are the second easiest to catch after syntax changes. Each
+                subsequent version of Python adds, deprecates, improves, or completely removes standard library modules.
+                Such a process was regular also in the older versions of Python (1.x and 2.x), so it does not come as a
+                shock in Python 3. In most cases, depending on the module that was removed or reorganized (like <code
+                        class="literal">urlparse</code> being moved to <code class="literal">urllib.parse</code>), it
+                will raise exceptions on the import time just after it was interpreted. This makes such issues so easy
+                to catch. Anyway, in order to be sure that all such issues are covered, the full test code coverage is
+                essential. In some cases (for example, when using lazily loaded modules), the issues that are usually
+                noticed on import time will not appear before some modules are used in code as function calls. This is
+                why, it is so important to make sure that every line of code is actually executed during tests suite.
+            </p>
+            <div class="note" style="" title="Note">
+                <div class="inner"><h3 class="title">Tip</h3>
+                    <p><span class="strong"><strong>Lazily loaded modules</strong></span></p>
+                    <p>A lazily loaded module is a module that is not loaded on import time. In Python, <code
+                            class="literal">import</code> statements can be included inside of functions so import will
+                        happen on a function call and not on import time. In some cases, such loading of modules may be
+                        a reasonable choice but in most cases, it is a workaround for poorly designed module structures
+                        (for example, to avoid circular imports) and should be generally avoided. For sure, there is no
+                        justifiable reason to lazily load standard library modules.</p></div>
+            </div>
+        </div>
+        <div class="section" title="Changes in datatypes and collections">
+            <div class="titlepage">
+                <div>
+                    <div><h3 class="title">Changes in datatypes and collections</h3></div>
+                </div>
+            </div>
+            <p>Changes in how Python represents datatypes and collections require the most effort when the developer
+                tries to maintain compatibility or simply port existing code to Python 3. While incompatible syntax or
+                standard library changes are easily noticeable and the most easy to fix, changes in collections and
+                types are either nonobvious or require a lot of repetitive work. A list of such changes is long and,
+                again, official documentation is the best reference.</p>
+            <p>Still, this section must cover the change in how string literals are treated in Python 3 because it seems
+                to be the most controversial and discussed change in Python 3, despite being a very good thing that now
+                makes things more explicit.</p>
+            <p>All string literals are now Unicode and <code class="literal">bytes</code> literals require a <code
+                    class="literal">b</code> or <code class="literal">B</code> prefix. For Python 3.0 and 3.1 using
+                <code class="literal">u</code> prefix (like <code class="literal">u"foo"</code>) was dropped and will
+                raise a syntax error. Dropping that prefix was the main reason for all controversies. It made really
+                hard to create code that was compatible in different branches of Python—version 2.x relied on this
+                prefix in order to create Unicode literals. This prefix was brought back in Python 3.3 to ease the
+                integration process, although without any syntactic meaning.</p></div>
+    </div>
+    <div class="section" title="The popular tools and techniques used for maintaining cross-version compatibility">
+        <div class="titlepage">
+            <div>
+                <div><h2 class="title">The popular tools and techniques used for maintaining cross-version
+                    compatibility</h2></div>
+            </div>
+        </div>
+        <p>Maintaining compatibility between versions of Python is a challenge. It may add a lot of additional work
+            depending on the size of the project but is definitely doable and worth doing. For packages that are meant
+            to be reused in many environments, it is an absolute must have. Open source packages without well-defined
+            and tested compatibility bounds are very unlikely to become popular, but also, closed third-party code that
+            never leaves the company network can greatly benefit from being tested in different environments.</p>
+        <p>It should be noted here that while this part focuses mainly on compatibility between various versions of
+            Python, these approaches apply for maintaining compatibility with external dependencies like different
+            package versions, binary libraries, systems, or external services.</p>
+        <p>The whole process can be divided into three main areas, ordered by importance:</p>
+        <div class="itemizedlist">
+            <ul class="itemizedlist">
+                <li class="listitem" style="list-style-type: disc">Defining and documenting target compatibility bounds
+                    and how they will be managed
+                </li>
+                <li class="listitem" style="list-style-type: disc">Testing in every environment and with every
+                    dependency version declared as compatible
+                </li>
+                <li class="listitem" style="list-style-type: disc">Implementing actual compatibility code</li>
+            </ul>
+        </div>
+        <p>Declaration of what is considered compatible is the most important part of the whole process because it gives
+            the users of the code (developers) the ability to have expectations and make assumptions on how it works and
+            how it can change in the future. Our code can be used as a dependency in different projects that may also
+            strive to manage compatibility, so the ability to reason how it behaves is crucial.</p>
+        <p>While this book tries to always give a few choices rather than to give an absolute recommendation on specific
+            options, here is one of the few exceptions. The best way so far to define how compatibility may change in
+            the future is by the proper approach to versioning numbers using <span class="emphasis"><em>Semantic Versioning</em></span>
+            (<a class="ulink" href="http://semver.org/">http://semver.org/</a>), or shortly, semver. It describes a
+            broadly accepted standard for marking the scope of change in code by the version specifier consisting only
+            of three numbers. It also gives some advice on how to handle deprecation policies. Here is an excerpt from
+            its summary:</p>
+        <p>Given a version number <code class="literal">MAJOR.MINOR.PATCH</code>, increment:</p>
+        <div class="itemizedlist">
+            <ul class="itemizedlist">
+                <li class="listitem" style="list-style-type: disc">A <code class="literal">MAJOR</code> version when you
+                    make incompatible API changes
+                </li>
+                <li class="listitem" style="list-style-type: disc">A <code class="literal">MINOR</code> version when you
+                    add functionality in a backwards-compatible manner
+                </li>
+                <li class="listitem" style="list-style-type: disc">A <code class="literal">PATCH</code> version when you
+                    make backwards-compatible bug fixes
+                </li>
+            </ul>
+        </div>
+        <p>Additional labels for pre-release and build metadata are available as extensions to the <code
+                class="literal">MAJOR.MINOR.PATCH</code> format.</p>
+        <p>When it comes to testing, the sad truth is that to be sure that code is compatible with every declared
+            dependency version and in every environment (here, the Python version), it must be tested in every
+            combination of these. This, of course, may not be possible when the project has a lot of dependencies
+            because the number of combinations grows rapidly with every new dependency in a version. So, typically some
+            trade off needs to be made so that running full compatibility tests does not take ages. A selection of tools
+            that help testing in so-called matrixes is presented in <a class="link" href="ch10.html"
+                                                                       title="Chapter 10. Test-Driven Development">Chapter
+                10</a>, <span class="emphasis"><em>Test-Driven Development</em></span>, that discusses testing in
+            general.</p>
+        <div class="note" style="" title="Note">
+            <div class="inner"><h3 class="title">Note</h3>
+                <p>The benefit of using projects that follow semver is that usually what needs to be tested are only
+                    major releases because minor and patch releases are guaranteed not to include backwards incompatible
+                    changes. This is only true if such projects can be trusted not to break such a contract.
+                    Unfortunately, mistakes happen to everyone and backward incompatible changes happen in a lot of
+                    projects, even on patch versions. Still, since semver declares strict compatibility on minor and
+                    patch version changes, breaking it is considered a bug, so it may be fixed in patch release.</p>
+            </div>
+        </div>
+        <p>Implementation of the compatibility layer is last and also least important if bounds of that compatibility
+            are well-defined and rigorously tested. Still there are some tools and techniques that every programmer
+            interested in such a topic should know.</p>
+        <p>The most basic is Python's <code class="literal">__future__</code> module. It ports back some features from
+            newer Python releases back into the older ones and takes the form of import statement:</p>
+        <div class="informalexample">
+            <pre class="programlisting">from __future__ import &lt;feature&gt;</pre>
+        </div>
+        <p>Features provided by <code class="literal">future</code> statements are syntax-related elements that cannot
+            be easily handled by different means. This statement affects only the module where it was used. Here is an
+            example of Python 2.7 interactive session that brings Unicode literals from Python 3.0:</p>
+        <div class="informalexample"><pre class="programlisting">
+<span class="strong"><strong>Python 2.7.10 (default, May 23 2015, 09:40:32) [MSC v.1500 32 bit (Intel)] on win32</strong></span>
+<span class="strong"><strong>Type "help", "copyright", "credits" or "license" for more information.</strong></span>
+<span class="strong"><strong>&gt;&gt;&gt; type("foo")  # old literals</strong></span>
+<span class="strong"><strong>&lt;type 'str'&gt;</strong></span>
+<span class="strong"><strong>&gt;&gt;&gt; from __future__ import unicode_literals</strong></span>
+<span class="strong"><strong>&gt;&gt;&gt; type("foo")  # now is unicode</strong></span>
+<span class="strong"><strong>&lt;type 'unicode'&gt;</strong></span>
+</pre>
+        </div>
+        <p>Here is a list of all the available <code class="literal">__future__</code> statement options that developers
+            concerned with 2/3 compatibility should know:</p>
+        <div class="itemizedlist">
+            <ul class="itemizedlist">
+                <li class="listitem" style="list-style-type: disc"><code class="literal">division</code>: This adds a
+                    Python 3 division operator (PEP 238)
+                </li>
+                <li class="listitem" style="list-style-type: disc"><code class="literal">absolute_import</code>: This
+                    makes every form of <code class="literal">import</code> statement not starting with a dot character
+                    interpreted as an absolute import (PEP 328)
+                </li>
+                <li class="listitem" style="list-style-type: disc"><code class="literal">print_function</code>: This
+                    changes a <code class="literal">print</code> statement into a function call, so parentheses around
+                    <code class="literal">print</code> becomes mandatory (PEP 3112)
+                </li>
+                <li class="listitem" style="list-style-type: disc"><code class="literal">unicode_literals</code>: This
+                    makes every string literal interpreted as Unicode literals (PEP 3112)
+                </li>
+            </ul>
+        </div>
+        <p>A list of the <code class="literal">__future__</code> statement options is very short and it covers only a
+            few syntax features. The other things that have changed like the metaclass syntax (which is an advanced
+            feature covered in <a class="link" href="ch03.html"
+                                  title="Chapter 3. Syntax Best Practices – above the Class Level">Chapter 3</a>, <span
+                    class="emphasis"><em>Syntax Best Practices – above the Class Level</em></span>), are a lot harder to
+            maintain. Reliably handling of multiple standard library reorganizations also cannot be solved by <code
+                    class="literal">future</code> statements. Happily, there are some tools that aim to provide a
+            consistent layer of ready-to-use compatibility. The most commonly known is Six (<a class="ulink"
+                                                                                               href="https://pypi.python.org/pypi/six/">https://pypi.python.org/pypi/six/</a>)
+            that provides whole common 2/3 compatibility boilerplate as a single module. The other promising but
+            slightly less popular tool is the future module (<a class="ulink" href="http://python-future.org/">http://python-future.org/</a>).
+        </p>
+        <p>In some situations, developers may not want to include additional dependencies in some small packages. A
+            common practice is the additional module that gathers all the compatibility code, usually named <code
+                    class="literal">compat.py</code>. Here is an example of such a <code class="literal">compat</code>
+            module taken from the <code class="literal">python-gmaps</code> project (<a class="ulink"
+                                                                                        href="https://github.com/swistakm/python-gmaps">https://github.com/swistakm/python-gmaps</a>):
+        </p>
+        <div class="informalexample"><pre class="programlisting"># -*- coding: utf-8 -*-
+import sys
+
+if sys.version_info &lt; (3, 0, 0):
+    import urlparse  # noqa
+
+    def is_string(s):
+        return isinstance(s, basestring)
+
+else:
+    from urllib import parse as urlparse  # noqa
+
+    def is_string(s):
+        return isinstance(s, str)</pre>
+        </div>
+        <p>Such a <code class="literal">compat.py</code> module is popular even in projects that depends on Six for 2/3
+            compatibility because it is a very convenient way to store code that handles compatibility with different
+            versions of packages used as dependencies.</p>
+        <div class="note" style="" title="Note">
+            <div class="inner"><h3 class="title">Tip</h3>
+                <p><span class="strong"><strong>Downloading the example code</strong></span></p>
+                <p>You can download the example code files for this book from your account at <a class="ulink"
+                                                                                                 href="http://www.packtpub.com">http://www.packtpub.com</a>.
+                    If you purchased this book elsewhere, you can visit <a class="ulink"
+                                                                           href="http://www.packtpub.com/support">http://www.packtpub.com/support</a>
+                    and register to have the files e-mailed directly to you.</p>
+                <p>You can download the code files by following these steps:</p>
+                <div class="itemizedlist">
+                    <ul class="itemizedlist">
+                        <li class="listitem" style="list-style-type: disc">Log in or register to our website using your
+                            e-mail address and password.
+                        </li>
+                        <li class="listitem" style="list-style-type: disc">Hover the mouse pointer on the <span
+                                class="strong"><strong>SUPPORT</strong></span> tab at the top.
+                        </li>
+                        <li class="listitem" style="list-style-type: disc">Click on <span class="strong"><strong>Code Downloads &amp; Errata</strong></span>.
+                        </li>
+                        <li class="listitem" style="list-style-type: disc">Enter the name of the book in the <span
+                                class="strong"><strong>Search</strong></span> box.
+                        </li>
+                        <li class="listitem" style="list-style-type: disc">Select the book for which you're looking to
+                            download the code files.
+                        </li>
+                        <li class="listitem" style="list-style-type: disc">Choose from the drop-down menu where you
+                            purchased this book from.
+                        </li>
+                        <li class="listitem" style="list-style-type: disc">Click on <span class="strong"><strong>Code Download</strong></span>.
+                        </li>
+                    </ul>
+                </div>
+                <p>Once the file is downloaded, please make sure that you unzip or extract the folder using the latest
+                    version of:</p>
+                <div class="itemizedlist">
+                    <ul class="itemizedlist">
+                        <li class="listitem" style="list-style-type: disc">WinRAR / 7-Zip for Windows</li>
+                        <li class="listitem" style="list-style-type: disc">Zipeg / iZip / UnRarX for Mac</li>
+                        <li class="listitem" style="list-style-type: disc">7-Zip / PeaZip for Linux</li>
+                    </ul>
+                </div>
+                <p>The code bundle for the book is also hosted on GitHub at <a class="ulink"
+                                                                               href="https://github.com/PacktPublishing/Expert-Python-Programming_Second-Edition">https://github.com/PacktPublishing/Expert-Python-Programming_Second-Edition</a>.
+                    We also have other code bundles from our rich catalog of books and videos available at <a
+                            class="ulink"
+                            href="https://github.com/PacktPublishing/">https://github.com/PacktPublishing/</a>. Check
+                    them out!</p></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
