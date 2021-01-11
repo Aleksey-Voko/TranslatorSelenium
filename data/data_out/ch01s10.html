@@ -1,0 +1,136 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Популярные инструменты повышения производительности</title>
+<link href="epub.css" rel="stylesheet" type="text/css"/>
+<meta content="DocBook XSL Stylesheets V1.75.2" name="generator"/>
+</head>
+<body id="page">
+<div class="section" title="Популярные инструменты повышения производительности">
+<div class="titlepage">
+<div>
+<div><h1 class="title">Популярные инструменты повышения производительности</h1></div>
+</div>
+</div>
+<p>Инструмент повышения производительности - это немного расплывчатый термин. С одной стороны, почти каждый выпущенный и доступный в сети пакет с открытым исходным кодом является своего рода средством повышения производительности - он предоставляет готовые к использованию решения какой-либо проблемы, поэтому никому не нужно тратить на это время (в идеале). С другой стороны, можно сказать, что весь Python - это производительность. И оба они несомненно верны. Кажется, что почти все на этом языке и в сообществе, окружающем его, спроектировано так, чтобы сделать разработку программного обеспечения максимально продуктивной.</p>
+<p>Это создает цикл положительной обратной связи. Поскольку писать код - это весело и легко, многие программисты тратят свое свободное время на создание инструментов, которые делают его еще проще и интереснее. И этот факт будет использован здесь в качестве основы для очень субъективного и ненаучного определения инструмента повышения производительности - части программного обеспечения, которая делает разработку проще и увлекательнее.</p>
+<p>По своей природе инструменты повышения производительности сосредоточены в основном на определенных элементах процесса разработки, таких как тестирование, отладка и управление пакетами, и не являются основными частями продуктов, которые они помогают создавать. В некоторых случаях они могут даже не упоминаться в кодовой базе проекта, несмотря на то, что они используются ежедневно.</p>
+<p>Наиболее важные инструменты повышения производительности, <code class="literal">pip</code>и <code class="literal">venv</code>, уже обсуждались ранее в этой главе. Некоторые из них имеют пакеты для решения конкретных задач, таких как профилирование и тестирование, и имеют свои собственные главы в книге. Этот раздел посвящен другим инструментам, о которых действительно стоит упомянуть, но в книге нет отдельной главы, где они могли бы быть представлены.</p>
+<div class="section" title="Пользовательские оболочки Python - IPython, bpython, ptpython и т. Д.">
+<div class="titlepage">
+<div>
+<div><h2 class="title">Пользовательские оболочки Python - IPython, bpython, ptpython и т. Д.</h2></div>
+</div>
+</div>
+<p>Программисты Python проводят много времени в сеансах интерактивного интерпретатора. Он очень хорош для тестирования небольших фрагментов кода, доступа к документации или даже отладки кода во время выполнения. Интерактивный сеанс Python по умолчанию очень прост и не предоставляет многих функций, таких как завершение табуляции или помощники по самоанализу кода. К счастью, оболочку Python по умолчанию можно легко расширить и настроить.</p>
+<p>Интерактивная подсказка может быть настроена с помощью файла запуска. Когда он запускается, он ищет <code class="literal">PYTHONSTARTUP</code>переменную среды и выполняет код в файле, на который указывает эта переменная. Некоторые дистрибутивы Linux предоставляют сценарий запуска по умолчанию, который обычно находится в вашем домашнем каталоге. Это называется <code class="literal">.pythonstartup</code>. Автозавершение табуляции и история команд часто предоставляются для улучшения подсказки и основаны на <code class="literal">readline</code>
+            модуле. (Вам нужна <code class="literal">readline</code>библиотека.)</p>
+<p>Если у вас нет такого файла, вы можете легко его создать. Вот пример простейшего файла запуска, который добавляет завершение с <code class="literal">&lt;Tab&gt;</code>ключом и историей:</p>
+<div class="informalexample"><pre class="programlisting"># python startup file
+import readline
+import rlcompleter
+import atexit
+import os
+
+# tab completion
+readline.parse_and_bind('tab: complete')
+
+# history file
+histfile = os.path.join(os.environ['HOME'], '.pythonhistory')
+try:
+    readline.read_history_file(histfile)
+
+except IOError:
+    pass
+
+atexit.register(readline.write_history_file, histfile)
+del os, histfile, readline, rlcompleter</pre>
+</div>
+<p>Создайте этот файл в своем домашнем каталоге и вызовите его <code class="literal">.pythonstartup</code>. Затем добавьте
+             <code class="literal">PYTHONSTARTUP</code>переменную в свою среду, используя путь к вашему файлу:</p>
+<div class="section" title="Настройка переменной среды PYTHONSTARTUP">
+<div class="titlepage">
+<div>
+<div><h3 class="title">Настройка переменной среды PYTHONSTARTUP</h3></div>
+</div>
+</div>
+<p>Если вы используете Linux или Mac OS X, самый простой способ - создать сценарий запуска в вашей домашней папке. Затем свяжите его с <code class="literal">PYTHONSTARTUP</code>переменной среды, заданной в сценарии запуска системной оболочки. Например, оболочки Bash и Korn используют <code class="literal">.profile</code>
+                файл, в который вы можете вставить строку следующим образом:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>export PYTHONSTARTUP=~/.pythonstartup</strong></span>
+</pre>
+</div>
+<p>Если вы работаете в Windows, легко установить новую переменную среды в качестве администратора в системных настройках и сохранить сценарий в общем месте, а не в определенном месте пользователя.</p>
+<p>Написание <code class="literal">PYTHONSTARTUP</code>сценария может быть хорошим упражнением, но создание хорошей пользовательской оболочки в одиночку - задача, на которую лишь немногие могут найти время. К счастью, существует несколько пользовательских реализаций оболочки Python, которые значительно улучшают взаимодействие с интерактивными сеансами в Python.</p></div>
+<div class="section" title="IPython">
+<div class="titlepage">
+<div>
+<div><h3 class="title">IPython</h3></div>
+</div>
+</div>
+<p>IPyhton ( <a class="ulink" href="http://ipython.scipy.org">http://ipython.scipy.org</a> ) предоставляет расширенную командную оболочку Python. Среди предоставленных функций наиболее интересными являются:</p>
+<div class="itemizedlist">
+<ul class="itemizedlist">
+<li class="listitem" style="list-style-type: disc">Самоанализ динамического объекта</li>
+<li class="listitem" style="list-style-type: disc">Доступ к системной оболочке из командной строки</li>
+<li class="listitem" style="list-style-type: disc">Прямая поддержка профилирования</li>
+<li class="listitem" style="list-style-type: disc">Средства отладки</li>
+</ul>
+</div>
+<p>Теперь IPython является частью более крупного проекта Jupyter, который предоставляет интерактивные записные книжки с живым кодом, который может быть написан на многих разных языках.</p></div>
+<div class="section" title="bpython">
+<div class="titlepage">
+<div>
+<div><h3 class="title">bpython</h3></div>
+</div>
+</div>
+<p>bpython ( <a class="ulink" href="http://bpython-interpreter.org/">http://bpython-interpreter.org/</a> ) рекламирует себя как причудливый интерфейс для интерпретатора Python. Вот некоторые из акцентов на странице проектов:</p>
+<div class="itemizedlist">
+<ul class="itemizedlist">
+<li class="listitem" style="list-style-type: disc">Встроенная подсветка синтаксиса</li>
+<li class="listitem" style="list-style-type: disc">Автозаполнение в виде строки чтения с предложениями, отображаемыми по мере ввода
+                    </li>
+<li class="listitem" style="list-style-type: disc">Списки ожидаемых параметров для любой функции Python
+                    </li>
+<li class="listitem" style="list-style-type: disc">Автоиндентирование</li>
+<li class="listitem" style="list-style-type: disc">Поддержка Python 3</li>
+</ul>
+</div>
+</div>
+<div class="section" title="ptpython">
+<div class="titlepage">
+<div>
+<div><h3 class="title">ptpython</h3></div>
+</div>
+</div>
+<p>ptpython ( <a class="ulink" href="https://github.com/jonathanslenders/ptpython/">https://github.com/jonathanslenders/ptpython/</a> ) - еще один подход к теме продвинутых оболочек Python. В этом проекте реализация основных утилит подсказок доступна в виде отдельного пакета <code class="literal">prompt_toolkit</code>
+                (от того же автора). Это позволяет легко создавать различные эстетичные интерактивные интерфейсы командной строки.</p>
+<p>Это часто сравнивают с bpython в функциональных , но основное отличие состоит в том , что она позволяет режим совместимости с IPython и его синтаксис , который позволяет дополнительные функции , такие как <code class="literal">%pdb</code>, <code class="literal">%cpaste</code>или <code class="literal">%profile</code>.
+            </p></div>
+</div>
+<div class="section" title="Интерактивные отладчики">
+<div class="titlepage">
+<div>
+<div><h2 class="title">Интерактивные отладчики</h2></div>
+</div>
+</div>
+<p>Отладка кода - неотъемлемый элемент процесса разработки программного обеспечения. Многие программисты могут проводить большую часть своей жизни, используя только обширные журналы и <code class="literal">print</code>операторы в качестве основных инструментов отладки, но большинство профессиональных разработчиков предпочитают полагаться на какой-либо отладчик.</p>
+<p>Python уже поставляется со встроенным интерактивным отладчиком <code class="literal">pdb</code>(см.
+             <a class="ulink" href="https://docs.python.org/3/library/pdb.html">Https://docs.python.org/3/library/pdb.html</a> ). Его можно вызвать из командной строки в существующем скрипте, поэтому Python перейдет к посмертной отладке, если программа завершится ненормально:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>python -m pdb script.py</strong></span>
+</pre>
+</div>
+<p>Посмертная отладка, хотя и полезна, не охватывает все сценарии. Это полезно только тогда, когда приложение существует, за некоторым исключением, если возникает ошибка. Во многих случаях ошибочный код просто ведет себя ненормально, но не завершается неожиданно. В таких случаях пользовательские точки останова могут быть установлены в определенной строке кода с помощью этой однострочной идиомы:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>import pdb; pdb.set_trace()</strong></span>
+</pre>
+</div>
+<p>Это заставит интерпретатор Python запустить сеанс отладчика в этой строке во время выполнения.</p>
+<p><code class="literal">pdb</code>очень полезен для отслеживания проблем и на первый взгляд может показаться очень знакомым для хорошо известного GDB (GNU Debugger). Поскольку Python - динамический язык, <code class="literal">pdb</code>сеанс очень похож на сеанс обычного интерпретатора. Это означает, что разработчик не ограничивается отслеживанием выполнения кода, но может вызывать любой код и даже выполнять импорт модулей.</p>
+<p>К сожалению, из - за его корни ( <code class="literal">bdb</code>), первого опыт с <code class="literal">pdb</code>может быть немного подавляющими из - за существования зашифрованного короткого письма отладчика команд , такие как <code class="literal">h</code>, <code class="literal">b</code>, <code class="literal">s</code>, <code class="literal">n</code>, <code class="literal">j</code>, и <code class="literal">r</code>. В случае сомнений <code class="literal">help pdb</code>команда, введенная во время сеанса отладчика, предоставит обширное использование и дополнительную информацию.</p>
+<p>Сеанс отладчика в pdb также очень прост и не предоставляет дополнительных функций, таких как завершение табуляции или выделение кода. К счастью, в PyPI доступно несколько пакетов, которые предоставляют такие функции, доступные из альтернативных оболочек Python, упомянутых в предыдущем разделе. Наиболее яркими примерами являются:</p>
+<div class="itemizedlist">
+<ul class="itemizedlist">
+<li class="listitem" style="list-style-type: disc"><code class="literal">ipdb</code>: Это отдельный пакет, основанный на <code class="literal">ipython</code></li>
+<li class="listitem" style="list-style-type: disc"><code class="literal">ptpdb</code>: Это отдельный пакет, основанный на <code class="literal">ptpython</code></li>
+<li class="listitem" style="list-style-type: disc"><code class="literal">bpdb</code>: Это связано с <code class="literal">bpython</code></li>
+</ul>
+</div>
+</div>
+</div>
+</body></html>

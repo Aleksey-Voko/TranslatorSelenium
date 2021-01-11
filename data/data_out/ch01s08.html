@@ -1,0 +1,203 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Изоляция сред Python на уровне приложений</title>
+<link href="epub.css" rel="stylesheet" type="text/css"/>
+<meta content="DocBook XSL Stylesheets V1.75.2" name="generator"/>
+</head>
+<body id="page">
+<div class="section" title="Изоляция сред Python на уровне приложений">
+<div class="titlepage">
+<div>
+<div><h1 class="title">Изоляция сред Python на уровне приложений</h1></div>
+</div>
+</div>
+<p>В настоящее время многие операционные системы поставляются с Python в качестве стандартного компонента. Большинство дистрибутивов Linux и систем на основе Unix, таких как FreeBSD, NetBSD, OpenBSD или OS X, поставляются с Python либо установлены по умолчанию, либо доступны через репозитории системных пакетов. Многие из них даже используют его как часть некоторых основных компонентов - Python поддерживает установщики Ubuntu (Ubiquity), Red Hat Linux (Anaconda) и Fedora (снова Anaconda).</p>
+<p>По этой причине многие пакеты из PyPI также доступны в виде собственных пакетов, управляемых такими системными инструментами управления пакетами, как <code class="literal">apt-get</code>(Debian, Ubuntu), <code class="literal">rpm</code>
+        (Red Hat Linux) или <code class="literal">emerge</code>(Gentoo). Хотя следует помнить, что список доступных библиотек очень ограничен и они в основном устарели по сравнению с PyPI. Это причина, по которой <code class="literal">pip</code>всегда следует использовать для получения новых пакетов в последней версии в качестве рекомендации <span class="strong"><strong>PyPA</strong></span> ( <span class="strong"><strong>Python Packaging Authority</strong></span> ). Хотя это независимый пакет, начиная с версий 2.7.9 и 3.4 CPython, он по умолчанию входит в состав каждой новой версии. Установить новый пакет очень просто:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>pip install &lt;package-name&gt;</strong></span>
+</pre>
+</div>
+<p>Среди других функций, <code class="literal">pip</code>позволяет форсировать определенные версии пакетов (используя
+         <code class="literal">pip install package-name==version </code>синтаксис) и обновлять до последней доступной версии (используя <code class="literal">––upgrade</code>переключатель). Полное описание использования большинства инструментов командной строки, представленных в книге, можно легко получить, просто запустив команду с переключателем <code class="literal">-h</code>или <code class="literal">--help</code>, но вот пример сеанса, демонстрирующий наиболее часто используемые параметры:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>$ pip show pip</strong></span>
+<span class="strong"><strong>---</strong></span>
+<span class="strong"><strong>Metadata-Version: 2.0</strong></span>
+<span class="strong"><strong>Name: pip</strong></span>
+<span class="strong"><strong>Version: 7.1.2</strong></span>
+<span class="strong"><strong>Summary: The PyPA recommended tool for installing Python packages.</strong></span>
+<span class="strong"><strong>Home-page: https://pip.pypa.io/</strong></span>
+<span class="strong"><strong>Author: The pip developers</strong></span>
+<span class="strong"><strong>Author-email: python-virtualenv@groups.google.com</strong></span>
+<span class="strong"><strong>License: MIT</strong></span>
+<span class="strong"><strong>Location: /usr/lib/python2.7/site-packages</strong></span>
+<span class="strong"><strong>Requires:</strong></span>
+
+<span class="strong"><strong>$ pip install 'pip&lt;7.0.0'</strong></span>
+<span class="strong"><strong>Collecting pip&lt;7.0.0</strong></span>
+<span class="strong"><strong>  Downloading pip-6.1.1-py2.py3-none-any.whl (1.1MB)</strong></span>
+<span class="strong"><strong>    100% |████████████████████████████████| 1.1MB 242kB/s</strong></span>
+<span class="strong"><strong>Installing collected packages: pip</strong></span>
+<span class="strong"><strong>  Found existing installation: pip 7.1.2</strong></span>
+<span class="strong"><strong>    Uninstalling pip-7.1.2:</strong></span>
+<span class="strong"><strong>      Successfully uninstalled pip-7.1.2</strong></span>
+<span class="strong"><strong>Successfully installed pip-6.1.1</strong></span>
+<span class="strong"><strong>You are using pip version 6.1.1, however version 7.1.2 is available.</strong></span>
+<span class="strong"><strong>You should consider upgrading via the 'pip install --upgrade pip' command.</strong></span>
+
+<span class="strong"><strong>$ pip install --upgrade pip</strong></span>
+<span class="strong"><strong>You are using pip version 6.1.1, however version 7.1.2 is available.</strong></span>
+<span class="strong"><strong>You should consider upgrading via the 'pip install --upgrade pip' command.</strong></span>
+<span class="strong"><strong>Collecting pip</strong></span>
+<span class="strong"><strong>  Using cached pip-7.1.2-py2.py3-none-any.whl</strong></span>
+<span class="strong"><strong>Installing collected packages: pip</strong></span>
+<span class="strong"><strong>  Found existing installation: pip 6.1.1</strong></span>
+<span class="strong"><strong>    Uninstalling pip-6.1.1:</strong></span>
+<span class="strong"><strong>      Successfully uninstalled pip-6.1.1</strong></span>
+<span class="strong"><strong>Successfully installed pip-7.1.2</strong></span>
+</pre>
+</div>
+<p>В некоторых случаях <code class="literal">pip</code>может быть недоступен по умолчанию. Начиная с версии Python 3.4 (а также Python 2.7.9) его всегда можно загрузить с помощью <code class="literal">ensurepip</code>модуля:
+    </p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>$ python -m ensurepip</strong></span>
+<span class="strong"><strong>Ignoring indexes: https://pypi.python.org/simple</strong></span>
+<span class="strong"><strong>Requirement already satisfied (use --upgrade to upgrade): setuptools in /usr/lib/python2.7/site-packages</strong></span>
+<span class="strong"><strong>Collecting pip</strong></span>
+<span class="strong"><strong>Installing collected packages: pip</strong></span>
+<span class="strong"><strong>Successfully installed pip-6.1.1</strong></span>
+</pre>
+</div>
+<p>Самая последняя информация о том, как установить pip для более старых версий Python, доступна на странице документации проекта по адресу <a class="ulink" href="https://pip.pypa.io/en/stable/installing/">https://pip.pypa.io/en/stable/installing/</a> .
+    </p>
+<div class="section" title="Почему изоляция?">
+<div class="titlepage">
+<div>
+<div><h2 class="title">Почему изоляция?</h2></div>
+</div>
+</div>
+<p><code class="literal">pip</code>может использоваться для установки общесистемных пакетов. В системах на базе Unix и Linux для этого потребуются привилегии суперпользователя, поэтому фактический вызов будет следующим:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>sudo pip install &lt;package-name&gt;</strong></span>
+</pre>
+</div>
+<p>Обратите внимание, что в Windows это не требуется, поскольку он не предоставляет интерпретатор Python по умолчанию, а Python в Windows обычно устанавливается вручную пользователем без прав суперпользователя.</p>
+<p>В любом случае, установка общесистемных пакетов непосредственно из PyPI не рекомендуется, и ее следует избегать. Это может показаться противоречием предыдущему утверждению, что использование<code class="literal">pip</code>это рекомендация PyPA, но для этого есть несколько серьезных причин. Как объяснялось ранее, Python очень часто является важной частью многих пакетов, доступных через репозитории пакетов операционной системы, и может обеспечивать работу многих важных служб. Сопровождающие системного дистрибутива прилагают много усилий для выбора правильных версий пакетов, соответствующих различным зависимостям пакетов. Очень часто пакеты Python, доступные в репозиториях пакетов системы, содержат пользовательские исправления или остаются устаревшими только для обеспечения совместимости с некоторыми другими компонентами системы. Принудительное обновление такого пакета <code class="literal">pip</code>до версии, которая нарушает некоторую обратную совместимость, может нарушить работу некоторых важных системных служб.</p>
+<p>Выполнение таких действий только на локальном компьютере в целях разработки также не является хорошим оправданием. Неосторожное использование <code class="literal">pip</code>этого способа почти всегда приводит к проблемам и в конечном итоге приводит к проблемам, которые очень трудно отладить. Это не означает, что установка пакетов из PyPI в глобальном масштабе строго запрещена, но это всегда следует делать осознанно и осознавая связанные с этим риски.</p>
+<p>К счастью, есть простое решение этой проблемы - изоляция окружающей среды. Существуют различные инструменты, которые позволяют изолировать среду выполнения Python на разных уровнях системной абстракции. Основная идея состоит в том, чтобы изолировать зависимости проекта от пакетов, необходимых для различных проектов и / или системных служб. Преимущества этого подхода:</p>
+<div class="itemizedlist">
+<ul class="itemizedlist">
+<li class="listitem" style="list-style-type: disc">Это решает дилемму «Project X зависит от версии 1.x, но Project Y требует 4.x». Разработчик может работать над несколькими проектами с разными зависимостями, которые могут даже конфликтовать, не рискуя повлиять друг на друга.
+                </li>
+<li class="listitem" style="list-style-type: disc">Проект больше не ограничен версиями пакетов, которые находятся в репозиториях его системного распространения.
+                </li>
+<li class="listitem" style="list-style-type: disc">Риск нарушения работы других системных служб, зависящих от определенных версий пакетов, отсутствует, поскольку новые версии пакетов доступны только в такой среде.
+                </li>
+<li class="listitem" style="list-style-type: disc">Список пакетов, которые являются зависимостями проекта, можно легко «заморозить», поэтому их очень легко воспроизвести.
+                </li>
+</ul>
+</div>
+<p>Самый простой и легкий подход к изоляции - использовать виртуальные среды на уровне приложений. Они сосредоточены только на изоляции интерпретатора Python и доступных в нем пакетов. Их очень легко настроить, и зачастую их достаточно для обеспечения надлежащей изоляции при разработке небольших проектов и пакетов.</p>
+<p>К сожалению, в некоторых случаях этого может быть недостаточно для обеспечения достаточной согласованности и воспроизводимости. В таких случаях изоляция на системном уровне является хорошим дополнением к рабочему процессу, и некоторые доступные решения этой проблемы объясняются далее в этой главе.</p></div>
+<div class="section" title="Популярные решения">
+<div class="titlepage">
+<div>
+<div><h2 class="title">Популярные решения</h2></div>
+</div>
+</div>
+<p>Есть несколько способов изолировать Python во время выполнения. Самый простой и самый очевидный, хотя и труднее поддерживать, чтобы изменить вручную <code class="literal">PATH</code>и <code class="literal">PYTHONPATH</code>переменные окружения и / или переместить Python бинарный файл в другое место , чтобы повлиять на то , что обнаруживает доступные пакеты и изменить его на специальное место , где мы хотим , чтобы сохранить нашего проекта зависимости. К счастью, есть несколько инструментов, которые помогают поддерживать виртуальные среды и то, как установленные пакеты хранятся в системе. Это в основном: <code class="literal">virtualenv</code>, <code class="literal">venv</code>и<code class="literal">buildout</code>. То, что они делают под капотом, фактически то же самое, что и то, что мы делаем вручную. Фактическая стратегия зависит от конкретной реализации инструмента, но в целом они более удобны в использовании и могут дать дополнительные преимущества.</p>
+<div class="section" title="virtualenv">
+<div class="titlepage">
+<div>
+<div><h3 class="title">virtualenv</h3></div>
+</div>
+</div>
+<p>Virtualenv - безусловно, самый популярный инструмент в этом списке. Его название просто расшифровывается как Virtual Environment. Это не часть стандартного дистрибутива Python, поэтому его нужно получить с помощью <code class="literal">pip</code>. Это один из пакетов, который стоит установить в масштабе всей системы (для использования <code class="literal">sudo</code>в системах на базе Linux и Unix).</p>
+<p>После его установки новая виртуальная среда создается с помощью следующей команды:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>virtualenv ENV</strong></span>
+</pre>
+</div>
+<p>Здесь <code class="literal">ENV</code>следует заменить желаемое имя для новой среды. Это создаст новый <code class="literal">ENV</code>каталог в текущем рабочем каталоге. Внутри он будет содержать несколько новых каталогов:</p>
+<div class="itemizedlist">
+<ul class="itemizedlist">
+<li class="listitem" style="list-style-type: disc"><code class="literal">bin/</code>: Здесь хранятся новый исполняемый файл Python и скрипты / исполняемые файлы, предоставленные другими пакетами.
+                    </li>
+<li class="listitem" style="list-style-type: disc"><code class="literal">lib/</code>и <code class="literal">include/</code>: Эти каталоги содержат файлы вспомогательных библиотек для нового Python внутри виртуальной среды. Новые пакеты будут установлены в формате <code class="literal">ENV/lib/pythonX.Y/site-packages/</code>.
+                    </li>
+</ul>
+</div>
+<p>После создания новой среды ее необходимо активировать в текущем сеансе оболочки с помощью исходной команды Unix:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>source ENV/bin/activate</strong></span>
+</pre>
+</div>
+<p>Это изменяет состояние текущих сеансов оболочки, влияя на ее переменные среды. Чтобы пользователь знал, что он активировал виртуальную среду, он изменит приглашение оболочки, добавив <code class="literal">(ENV)</code>строку в ее начале. Вот пример сеанса, который создает новую среду и активирует ее, чтобы проиллюстрировать это:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>$ virtualenv example</strong></span>
+<span class="strong"><strong>New python executable in example/bin/python</strong></span>
+<span class="strong"><strong>Installing setuptools, pip, wheel...done.</strong></span>
+<span class="strong"><strong>$ source example/bin/activate</strong></span>
+<span class="strong"><strong>(example)$ deactivate</strong></span>
+<span class="strong"><strong>$ </strong></span>
+</pre>
+</div>
+<p>Важно отметить, <code class="literal">virtualenv</code>что он полностью зависит от своего состояния, хранящегося в файловой системе. Он не предоставляет никаких дополнительных возможностей для отслеживания того, какие пакеты должны быть в нем установлены. Эти виртуальные среды не переносимы и не должны переноситься на другую систему / машину. Это означает, что новую виртуальную среду необходимо создавать с нуля для каждого развертывания нового приложения. Из-за этого <code class="literal">virtualenv</code>пользователи рекомендуют хранить все зависимости проекта в <code class="literal">requirements.txt</code>файле (это соглашение об именах), как показано в следующем коде:</p>
+<div class="informalexample"><pre class="programlisting"># lines followed by hash (#) are treated as a comments
+
+# strict version names are best for reproducibility
+eventlet==0.17.4
+graceful==0.1.1
+
+# for projects that are well tested with different
+# dependency versions the relative version specifiers
+# are acceptable too
+falcon&gt;=0.3.0,&lt;0.5.0
+
+# packages without versions should be avoided unless
+# latest release is always required/desired
+pytz</pre>
+</div>
+<p>С такими файлами все зависимости можно легко установить с помощью, <code class="literal">pip</code>поскольку он принимает файл требований в качестве вывода:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>pip install -r requirements.txt</strong></span>
+</pre>
+</div>
+<p>Следует помнить, что файл требований не всегда является идеальным решением, поскольку он не определяет точный список зависимостей, а только те, которые должны быть установлены. Таким образом, весь проект может работать без проблем в среде разработки, но не сможет запуститься в других, если файл требований устарел и не отражает фактическое состояние среды. Конечно, есть
+                 <code class="literal">pip freeze</code>команда, которая печатает все пакеты в текущей среде, но ее не следует использовать вслепую - она ​​выведет все, даже пакеты, которые не используются в проекте, но установлены только для тестирования. Другой инструмент, упомянутый в книге,<code class="literal">buildout</code>, решает эту проблему, поэтому это может быть лучшим выбором для некоторых групп разработчиков.</p>
+<div class="note" style="" title="Запись">
+<div class="inner"><h3 class="title">Запись</h3>
+<p>Для пользователей <code class="literal">virtualenv</code>Windows в Windows используется другое именование внутренней структуры каталогов. Вам нужно использовать <code class="literal">Scripts/</code>,
+                         <code class="literal">Libs/</code>и <code class="literal">Include/</code>вместо того <code class="literal">bin/</code>, <code class="literal">lib/</code>, <code class="literal">include/</code>, чтобы лучше конвенций по спичка на этой операционной системе. Команды, используемые для активации / деактивации среды, также различны; Вы должны использовать <code class="literal">ENV/Scripts/activate.bat</code>и <code class="literal">ENV/Scripts/deactivate.bat</code>
+                        вместо того , чтобы использовать <code class="literal">source</code>на <code class="literal">activate</code>
+                        и <code class="literal">deactivate</code>сценарии.</p></div>
+</div>
+</div>
+<div class="section" title="Venv">
+<div class="titlepage">
+<div>
+<div><h3 class="title">Venv</h3></div>
+</div>
+</div>
+<p>Вскоре виртуальные среды стали широко распространенным и популярным инструментом в сообществе. Начиная с Python 3.3 создание виртуальных сред поддерживается стандартной библиотекой. Использование почти такое же, как и в Virtualenv, хотя параметры командной строки имеют совершенно другое соглашение об именах. Новый
+                 <code class="literal">venv</code>модуль предоставляет <code class="literal">pyvenv</code>скрипт для создания новой виртуальной среды:</p>
+<div class="informalexample"><pre class="programlisting"><span class="strong"><strong>pyvenv ENV</strong></span>
+</pre>
+</div>
+<p>Здесь <code class="literal">ENV</code>следует заменить желаемое имя для новой среды. Кроме того, теперь новые среды можно создавать непосредственно из кода Python, потому что все функциональные возможности доступны из встроенного <code class="literal">venv</code>модуля. Другие детали использования и реализации, такие как структура каталога среды и скрипты активации / деактивации, в основном такие же, как и в Virtualenv, поэтому переход на это решение должен быть простым и безболезненным.</p>
+<p>Разработчикам, использующим более новые версии Python, рекомендуется использовать <code class="literal">venv</code>
+                вместо Virtualenv. Для Python 3.3 переход на использование <code class="literal">venv</code>может потребовать дополнительных усилий, потому что в этой версии он не устанавливается <code class="literal">setuptools</code>и <code class="literal">pip</code>по умолчанию в новой среде, поэтому пользователям необходимо установить их вручную. К счастью, он изменился в Python 3.4, и, кроме того, благодаря <code class="literal">venv</code>возможности настройки его поведение можно переопределить. Подробности объясняются в документации Python (см. <a class="ulink" href="https://docs.python.org/3.5/library/venv.html">Https://docs.python.org/3.5/library/venv.html</a> ), но некоторым пользователям это может показаться слишком сложным и они останутся с Virtualenv для этой конкретной версии Python.</p></div>
+<div class="section" title="построить из">
+<div class="titlepage">
+<div>
+<div><h3 class="title">построить из</h3></div>
+</div>
+</div>
+<p>Buildout - это мощный инструмент для начальной загрузки и развертывания приложений, написанных на Python. Некоторые из его расширенных функций также будут объяснены позже в книге. Долгое время он также использовался как инструмент для создания изолированных сред Python. Поскольку для Buildout требуется декларативная конфигурация, которую необходимо изменять каждый раз при изменении зависимостей, вместо того, чтобы полагаться на состояние среды, эти среды было проще воспроизводить и управлять ими.</p>
+<p>К сожалению, это изменилось. Не <code class="literal">buildout</code>пакет , начиная с версии 2.0.0 больше не пытается обеспечить любой уровень изоляции от установки системы Python. Обработка изоляции возложена на другие инструменты, такие как Virtualenv, поэтому все еще можно иметь изолированные сборки, но все становится немного сложнее. Buildout должен быть инициализирован внутри изолированной среды, чтобы быть действительно изолированным.</p>
+<p>У этого есть серьезный недостаток по сравнению с предыдущими версиями Buildout, поскольку он зависит от других решений для изоляции. Разработчик, работающий над этим кодом, больше не может быть уверен, что описание зависимостей завершено, поскольку некоторые пакеты можно установить, минуя декларативную конфигурацию. Эту проблему, конечно, можно решить с помощью надлежащих процедур тестирования и выпуска, но это добавляет сложности ко всему рабочему процессу.</p>
+<p>Подводя итог, Buildout больше не является решением, обеспечивающим изоляцию среды, но его декларативная конфигурация может улучшить ремонтопригодность и воспроизводимость виртуальных сред.</p></div>
+</div>
+<div class="section" title="Какой выбрать?">
+<div class="titlepage">
+<div>
+<div><h2 class="title">Какой выбрать?</h2></div>
+</div>
+</div>
+<p>Нет лучшего решения, подходящего для каждого случая использования. То, что хорошо в одной организации, может не соответствовать рабочему процессу других команд. Кроме того, у каждого приложения разные потребности. Небольшие проекты могут легко зависеть от подошвы <code class="literal">virtualenv</code>или , <code class="literal">venv</code>но более крупные могут потребоваться дополнительная помощь от <code class="literal">buildout</code>выполнять более сложную сборку.</p>
+<p>Что не было подробно описано ранее, так это то, что предыдущие версии Buildout (buildout &lt;2.0.0) позволяли сборку проектов в изолированной среде с аналогичными результатами, предоставляемыми Virtualenv. К сожалению, ветвь 1.x этого проекта больше не поддерживается, поэтому использовать ее для этой цели не рекомендуется.</p>
+<p>Я бы рекомендовал по возможности использовать <code class="literal">venv</code>модуль вместо Virtualenv. Таким образом, это должно быть выбором по умолчанию для проектов, ориентированных на Python версии 3.4 и выше. Использование
+             <code class="literal">venv</code>в Python 3.3 может быть немного неудобным из-за отсутствия встроенной поддержки <code class="literal">setuptools</code>и <code class="literal">pip</code>. Для проектов, ориентированных на более широкий спектр времени выполнения Python (включая альтернативные интерпретаторы и ветку 2.x), кажется, что Virtualenv - лучший выбор.</p></div>
+</div>
+</body></html>
