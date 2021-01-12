@@ -13,7 +13,7 @@ from definitions import ROOT_DIR
 
 def translate(f_name):
     with webdriver.Chrome(ROOT_DIR / 'drivers/chromedriver') as driver:
-        driver.get(f_name)
+        driver.get(f_name.as_uri())
         driver.maximize_window()
 
         html_code_in = driver.page_source

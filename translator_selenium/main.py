@@ -1,4 +1,5 @@
 from pathlib import Path
+from pprint import pprint
 
 from definitions import DATA_IN, DATA_OUT
 from translator import translate
@@ -6,16 +7,17 @@ from utils import remove_google_tags
 
 
 def main():
-    en_file_list = [str(x.as_uri()) for x in DATA_IN.rglob('*.html')]
-    translated_files = [str(x.as_uri()) for x in DATA_OUT.rglob('*.html')]
+    translated_files = [
+        x.relative_to(DATA_OUT) for x in DATA_OUT.rglob('*.html')
+    ]
 
-    for en_file in en_file_list:
-        if en_file not in translated_files:
+    for en_file in DATA_IN.rglob('*.html'):
+        if en_file.relative_to(DATA_IN) not in translated_files:
             html_code = translate(en_file)
             html_code = remove_google_tags(html_code)
 
-            f_name = Path(en_file).name
-            f_path = (DATA_OUT / f_name)
+            f_path = (DATA_OUT / en_file.relative_to(DATA_IN))
+            Path(f_path).parent.mkdir(parents=True, exist_ok=True)
             with open(f_path, 'w', encoding='utf-8') as f_out:
                 f_out.write(html_code)
 
