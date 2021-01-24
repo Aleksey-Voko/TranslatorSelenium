@@ -17,6 +17,7 @@ def main():
             html_code = remove_google_tags(html_code)
 
             f_path = (DATA_OUT / en_file.relative_to(DATA_IN))
+            # f_path = f_path.with_suffix('.xhtml')
             Path(f_path).parent.mkdir(parents=True, exist_ok=True)
             with open(f_path, 'w', encoding='utf-8') as f_out:
                 f_out.write(html_code)
