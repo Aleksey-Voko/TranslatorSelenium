@@ -1,5 +1,4 @@
 from pathlib import Path
-from pprint import pprint
 
 from definitions import DATA_IN, DATA_OUT
 from translator import translate
